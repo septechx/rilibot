@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    restart: unless-stopped
+    # Add healthcheck to ensure the bot is running
+    healthcheck:
+      test: [ "CMD", "ps", "aux", "|", "grep", "rilibot" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
