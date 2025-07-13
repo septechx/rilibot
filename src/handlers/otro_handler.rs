@@ -13,7 +13,7 @@ impl OtroHandler {
 #[async_trait]
 impl MessageHandler for OtroHandler {
     fn should_handle(&self, msg: &Message) -> bool {
-        !msg.author.bot && msg.content.contains("otro")
+        !msg.author.bot && msg.content.to_lowercase().contains("otro")
     }
 
     async fn handle(&self, ctx: &Context, msg: &Message) -> serenity::Result<()> {
