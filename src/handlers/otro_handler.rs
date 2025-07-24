@@ -1,5 +1,7 @@
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
+use crate::Handler;
+
 use super::MessageHandler;
 
 pub struct OtroHandler;
@@ -16,7 +18,12 @@ impl MessageHandler for OtroHandler {
         !msg.author.bot && msg.content.to_lowercase().contains("otro")
     }
 
-    async fn handle(&self, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(
+        &self,
+        _handler: &Handler,
+        ctx: &Context,
+        msg: &Message,
+    ) -> serenity::Result<()> {
         msg.channel_id
             .say(&ctx.http, "Como que el otro?")
             .await

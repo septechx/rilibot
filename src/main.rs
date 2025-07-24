@@ -1,4 +1,5 @@
-use std::env;
+mod commands;
+mod handlers;
 
 use serenity::{
     async_trait,
@@ -6,21 +7,28 @@ use serenity::{
     prelude::*,
 };
 
-mod handlers;
-use handlers::{MessageHandlerRegistry, OtroHandler};
+use std::env;
 
-struct Handler {
+use commands::{CommandHandlerRegistry, SayHandler};
+use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler};
+
+pub struct Handler {
     message_handlers: MessageHandlerRegistry,
+    command_handlers: CommandHandlerRegistry,
 }
 
 impl Handler {
     fn new() -> Self {
-        let mut registry = MessageHandlerRegistry::new();
-        registry.register(OtroHandler::new());
-        // Add more handlers here as needed
+        let mut mhr = MessageHandlerRegistry::new();
+        mhr.register(OtroHandler::new());
+        mhr.register(CommandHandler::new());
+
+        let mut chr = CommandHandlerRegistry::new();
+        chr.register("say", SayHandler::new());
 
         Self {
-            message_handlers: registry,
+            message_handlers: mhr,
+            command_handlers: chr,
         }
     }
 }
@@ -28,7 +36,9 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        self.message_handlers.process_message(&ctx, &msg).await;
+        self.message_handlers
+            .process_message(self, &ctx, &msg)
+            .await;
     }
 
     async fn ready(&self, _: Context, ready: Ready) {
