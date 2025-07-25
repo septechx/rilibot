@@ -1,7 +1,7 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use serenity::{all::Timestamp, async_trait, model::channel::Message, prelude::*};
 
-use super::{args_checked, usage, CommandHandler};
+use super::{CommandHandler, args_checked, usage};
 
 pub struct MuteHandler;
 
@@ -64,7 +64,7 @@ impl CommandHandler for MuteHandler {
                     msg.channel_id
                         .say(
                             &ctx.http,
-                            format!("Timed out {user_id} for {duration_str}."),
+                            format!("Timed out <@{user_id}> for {duration_str}."),
                         )
                         .await?;
                 }
@@ -74,10 +74,7 @@ impl CommandHandler for MuteHandler {
             }
         }
 
-        msg.channel_id
-            .say(&ctx.http, args.join(" "))
-            .await
-            .map(|_| ())
+        Ok(())
     }
 }
 
