@@ -12,7 +12,7 @@ pub async fn connect() -> Result<Client> {
     let db = get_env_var("POSTGRES_DB");
 
     let (client, connection) = tokio_postgres::connect(
-        &format!("host={host}, user={user}, password={password}, dbname={db}"),
+        &format!("host={host} user={user} password={password} dbname={db}"),
         NoTls,
     )
     .await?;
