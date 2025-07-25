@@ -33,7 +33,7 @@ impl CommandHandler for HelpHandler {
                     .join("\n");
 
                 msg.channel_id
-                    .say(&ctx.http, format!("Commands:\n{cmds}"))
+                    .say(&ctx.http, format!("**Commands:**\n{cmds}"))
                     .await?;
             }
             1 => {
