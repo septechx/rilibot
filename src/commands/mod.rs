@@ -1,5 +1,6 @@
 mod mute_command;
 mod say_command;
+mod unmute_command;
 
 use anyhow::{bail, Result};
 use serenity::{async_trait, model::channel::Message, prelude::*};
@@ -8,6 +9,7 @@ use std::collections::HashMap;
 
 pub use mute_command::MuteHandler;
 pub use say_command::SayHandler;
+pub use unmute_command::UnmuteHandler;
 
 #[async_trait]
 pub trait CommandHandler: Send + Sync {
@@ -60,13 +62,13 @@ pub async fn args_checked<'a>(
     msg: &'a Message,
     expected_len: usize,
     usage_s: &'static str,
-) -> anyhow::Result<Vec<&'a str>> {
+) -> Result<Vec<&'a str>> {
     let args = args(msg);
 
     if args.len() != expected_len {
         msg.channel_id.say(&ctx.http, usage(usage_s)).await?;
 
-        anyhow::bail!(
+        bail!(
             "Expected {} arguments, received {}",
             expected_len,
             args.len()
@@ -78,4 +80,14 @@ pub async fn args_checked<'a>(
 
 pub fn usage(s: &'static str) -> String {
     format!("Usage: {s}")
+}
+
+pub async fn send_usage(ctx: &Context, msg: &Message, usage_msg: String) -> serenity::Result<()> {
+    msg.channel_id.say(&ctx.http, usage_msg).await?;
+    Ok(())
+}
+
+pub async fn send_error(ctx: &Context, msg: &Message, err: &str) -> serenity::Result<()> {
+    msg.channel_id.say(&ctx.http, err).await?;
+    Ok(())
 }

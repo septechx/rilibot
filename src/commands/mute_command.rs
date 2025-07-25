@@ -1,7 +1,7 @@
-use anyhow::{Result, anyhow, bail};
+use anyhow::{anyhow, bail, Result};
 use serenity::{all::Timestamp, async_trait, model::channel::Message, prelude::*};
 
-use super::{CommandHandler, args_checked, usage};
+use super::{args_checked, send_error, send_usage, usage, CommandHandler};
 
 pub struct MuteHandler;
 
@@ -11,20 +11,10 @@ impl MuteHandler {
     }
 }
 
-async fn send_usage(ctx: &Context, msg: &Message, usage_msg: String) -> serenity::Result<()> {
-    msg.channel_id.say(&ctx.http, usage_msg).await?;
-    Ok(())
-}
-
-async fn send_error(ctx: &Context, msg: &Message, err: &str) -> serenity::Result<()> {
-    msg.channel_id.say(&ctx.http, err).await?;
-    Ok(())
-}
-
 #[async_trait]
 impl CommandHandler for MuteHandler {
     async fn handle(&self, ctx: &Context, msg: &Message) -> serenity::Result<()> {
-        let usage_s = "!mute @user duration";
+        let usage_s = "$mute @user duration";
         let args = match args_checked(ctx, msg, 2, usage_s).await {
             Ok(a) => a,
             Err(_) => return Ok(()),
@@ -62,14 +52,11 @@ impl CommandHandler for MuteHandler {
             {
                 Ok(_) => {
                     msg.channel_id
-                        .say(
-                            &ctx.http,
-                            format!("Timed out <@{user_id}> for {duration_str}."),
-                        )
+                        .say(&ctx.http, format!("Muted <@{user_id}> for {duration_str}."))
                         .await?;
                 }
                 Err(err) => {
-                    send_error(ctx, msg, &format!("Failed to timeout user: {err:?}")).await?;
+                    send_error(ctx, msg, &format!("Failed to mute user: {err:?}")).await?;
                 }
             }
         }
