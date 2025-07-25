@@ -20,7 +20,7 @@ impl CommandHandler for HelpHandler {
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
         let usage_s = self.get_usage();
-        let args = match args_checked(ctx, msg, 2, usage_s).await {
+        let args = match args_checked(ctx, msg, 1, usage_s).await {
             Ok(a) => a,
             Err(_) => return Ok(()),
         };
