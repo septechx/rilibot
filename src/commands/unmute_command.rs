@@ -1,6 +1,7 @@
+use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{send_error, send_usage, usage, CommandHandler};
+use super::{assert_mod, send_error, send_usage, usage, CommandHandler};
 
 use crate::Handler;
 
@@ -18,7 +19,9 @@ impl CommandHandler for UnmuteHandler {
         "$unmute @user"
     }
 
-    async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+        assert_mod(state, ctx, msg).await?;
+
         let usage_s = self.get_usage();
 
         let user_id = match msg.mentions.first() {

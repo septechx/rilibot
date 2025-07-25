@@ -1,6 +1,8 @@
 mod commands;
+mod db;
 mod handlers;
 
+use anyhow::Result;
 use serenity::{
     async_trait,
     model::{channel::Message, gateway::Ready},
@@ -13,12 +15,13 @@ use commands::{CommandHandlerRegistry, HelpHandler, MuteHandler, SayHandler, Unm
 use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler};
 
 pub struct Handler {
+    db_client: tokio_postgres::Client,
     message_handlers: MessageHandlerRegistry,
     command_handlers: CommandHandlerRegistry,
 }
 
 impl Handler {
-    fn new() -> Self {
+    fn new(clt: tokio_postgres::Client) -> Self {
         let mut mhr = MessageHandlerRegistry::new();
         mhr.register(OtroHandler::new());
         mhr.register(CommandHandler::new());
@@ -30,6 +33,7 @@ impl Handler {
         chr.register("help", HelpHandler::new());
 
         Self {
+            db_client: clt,
             message_handlers: mhr,
             command_handlers: chr,
         }
@@ -44,25 +48,28 @@ impl EventHandler for Handler {
             .await;
     }
 
-    async fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
 
 #[tokio::main]
-async fn main() {
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+async fn main() -> Result<()> {
+    let token = get_env_var("DISCORD_TOKEN");
+    let intents = GatewayIntents::all();
 
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::DIRECT_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
+    let db_client = db::connect().await?;
 
     let mut client = Client::builder(&token, intents)
-        .event_handler(Handler::new())
-        .await
-        .expect("Err creating client");
+        .event_handler(Handler::new(db_client))
+        .await?;
 
-    if let Err(err) = client.start().await {
-        println!("Client error: {err:?}");
-    }
+    client.start().await?;
+
+    Ok(())
+}
+
+pub fn get_env_var(key: &'static str) -> String {
+    let err = format!("{key} env variable not found");
+    env::var(key).expect(&err)
 }

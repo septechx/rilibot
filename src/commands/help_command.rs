@@ -1,6 +1,7 @@
+use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{args, send_error, usage, CommandHandler};
+use super::{CommandHandler, args, send_error, usage};
 
 use crate::Handler;
 
@@ -18,7 +19,7 @@ impl CommandHandler for HelpHandler {
         "$help (command)"
     }
 
-    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
         let usage_s = self.get_usage();
         let args = args(msg);
 

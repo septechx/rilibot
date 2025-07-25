@@ -1,6 +1,7 @@
+use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{args, CommandHandler};
+use super::{CommandHandler, args};
 
 use crate::Handler;
 
@@ -18,12 +19,14 @@ impl CommandHandler for SayHandler {
         "$say ...message"
     }
 
-    async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
         let args = args(msg);
 
         msg.channel_id
             .say(&ctx.http, args.join(" "))
             .await
-            .map(|_| ())
+            .map(|_| ())?;
+
+        Ok(())
     }
 }

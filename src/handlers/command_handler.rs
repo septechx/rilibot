@@ -1,3 +1,4 @@
+use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use crate::Handler;
@@ -18,7 +19,7 @@ impl MessageHandler for CommandHandler {
         !msg.author.bot && msg.content.to_lowercase().starts_with("$")
     }
 
-    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
         let cmd: Vec<_> = msg.content.strip_prefix("$").unwrap().split(' ').collect();
 
         if !cmd.is_empty() {

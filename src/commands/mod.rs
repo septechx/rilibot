@@ -3,9 +3,10 @@ mod mute_command;
 mod say_command;
 mod unmute_command;
 
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
+use serenity::model::id::RoleId;
 use std::collections::HashMap;
 
 pub use help_command::HelpHandler;
@@ -13,11 +14,12 @@ pub use mute_command::MuteHandler;
 pub use say_command::SayHandler;
 pub use unmute_command::UnmuteHandler;
 
+use crate::db::queries;
 use crate::Handler;
 
 #[async_trait]
 pub trait CommandHandler: Send + Sync {
-    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()>;
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()>;
     fn get_usage(&self) -> &'static str;
 }
 
@@ -42,7 +44,7 @@ impl CommandHandlerRegistry {
         ctx: &Context,
         msg: &Message,
         name: &String,
-    ) -> serenity::Result<()> {
+    ) -> Result<()> {
         match self.handlers.get(name.as_str()) {
             Some(ch) => {
                 if let Err(err) = ch.handle(state, ctx, msg).await {
@@ -88,12 +90,44 @@ pub fn usage(s: &'static str) -> String {
     format!("Usage: {s}")
 }
 
-pub async fn send_usage(ctx: &Context, msg: &Message, usage_msg: String) -> serenity::Result<()> {
+pub async fn send_usage(ctx: &Context, msg: &Message, usage_msg: String) -> Result<()> {
     msg.channel_id.say(&ctx.http, usage_msg).await?;
     Ok(())
 }
 
-pub async fn send_error(ctx: &Context, msg: &Message, err: &str) -> serenity::Result<()> {
+pub async fn send_error(ctx: &Context, msg: &Message, err: &str) -> Result<()> {
     msg.channel_id.say(&ctx.http, err).await?;
     Ok(())
+}
+
+pub async fn user_has_role(ctx: &Context, msg: &Message, role_id_str: &str) -> Result<bool> {
+    let guild_id = match msg.guild_id {
+        Some(g) => g,
+        None => return Ok(false),
+    };
+    let member = match guild_id.member(&ctx.http, msg.author.id).await {
+        Ok(m) => m,
+        Err(_) => return Ok(false),
+    };
+    let role_id = match role_id_str.parse::<u64>() {
+        Ok(id) => RoleId::from(id),
+        Err(_) => return Ok(false),
+    };
+    Ok(member.roles.contains(&role_id))
+}
+
+pub async fn assert_mod(state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+    let guild_id = msg.guild_id.ok_or(anyhow!("Command not ran in a server"))?;
+    let role_id = queries::mod_role(&state.db_client, &guild_id.get().to_string())
+        .await?
+        .ok_or(anyhow!("Role id not found in database"))?;
+
+    if user_has_role(ctx, msg, &role_id).await? {
+        Ok(())
+    } else {
+        msg.channel_id
+            .say(&ctx.http, "You do not have permission to run that command")
+            .await?;
+        bail!("User does not have the mod role")
+    }
 }

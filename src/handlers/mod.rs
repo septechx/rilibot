@@ -1,6 +1,7 @@
 mod command_handler;
 mod otro_handler;
 
+use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use crate::Handler;
@@ -12,8 +13,7 @@ pub use otro_handler::OtroHandler;
 pub trait MessageHandler: Send + Sync {
     fn should_handle(&self, msg: &Message) -> bool;
 
-    async fn handle(&self, handler: &Handler, ctx: &Context, msg: &Message)
-        -> serenity::Result<()>;
+    async fn handle(&self, handler: &Handler, ctx: &Context, msg: &Message) -> Result<()>;
 }
 
 pub struct MessageHandlerRegistry {

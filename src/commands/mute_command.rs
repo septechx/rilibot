@@ -3,7 +3,7 @@ use serenity::{all::Timestamp, async_trait, model::channel::Message, prelude::*}
 
 use crate::Handler;
 
-use super::{args_checked, send_error, send_usage, usage, CommandHandler};
+use super::{args_checked, assert_mod, send_error, send_usage, usage, CommandHandler};
 
 pub struct MuteHandler;
 
@@ -19,7 +19,9 @@ impl CommandHandler for MuteHandler {
         "$mute @user duration"
     }
 
-    async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+        assert_mod(state, ctx, msg).await?;
+
         let usage_s = self.get_usage();
         let args = match args_checked(ctx, msg, 2, usage_s).await {
             Ok(a) => a,
