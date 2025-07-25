@@ -9,7 +9,7 @@ use serenity::{
 
 use std::env;
 
-use commands::{CommandHandlerRegistry, SayHandler};
+use commands::{CommandHandlerRegistry, MuteHandler, SayHandler};
 use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler};
 
 pub struct Handler {
@@ -25,6 +25,7 @@ impl Handler {
 
         let mut chr = CommandHandlerRegistry::new();
         chr.register("say", SayHandler::new());
+        chr.register("mute", MuteHandler::new());
 
         Self {
             message_handlers: mhr,

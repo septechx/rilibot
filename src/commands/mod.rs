@@ -1,9 +1,12 @@
+mod mute_command;
 mod say_command;
 
+use anyhow::{bail, Result};
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use std::collections::HashMap;
 
+pub use mute_command::MuteHandler;
 pub use say_command::SayHandler;
 
 #[async_trait]
@@ -50,4 +53,29 @@ impl CommandHandlerRegistry {
 pub fn args(msg: &Message) -> Vec<&str> {
     let parts: Vec<_> = msg.content.strip_prefix("$").unwrap().split(' ').collect();
     parts[1..].to_vec()
+}
+
+pub async fn args_checked<'a>(
+    ctx: &Context,
+    msg: &'a Message,
+    expected_len: usize,
+    usage_s: &'static str,
+) -> anyhow::Result<Vec<&'a str>> {
+    let args = args(msg);
+
+    if args.len() != expected_len {
+        msg.channel_id.say(&ctx.http, usage(usage_s)).await?;
+
+        anyhow::bail!(
+            "Expected {} arguments, received {}",
+            expected_len,
+            args.len()
+        );
+    }
+
+    Ok(args)
+}
+
+pub fn usage(s: &'static str) -> String {
+    format!("Usage: {s}")
 }
