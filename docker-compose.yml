@@ -17,9 +17,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    ports:
-      - "80:80"
-      - "443:443"
 
   bot-db:
     image: postgres:16-alpine
@@ -41,5 +38,3 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8080:80"
