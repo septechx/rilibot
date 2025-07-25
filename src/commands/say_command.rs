@@ -2,6 +2,8 @@ use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use super::{args, CommandHandler};
 
+use crate::Handler;
+
 pub struct SayHandler;
 
 impl SayHandler {
@@ -12,7 +14,11 @@ impl SayHandler {
 
 #[async_trait]
 impl CommandHandler for SayHandler {
-    async fn handle(&self, ctx: &Context, msg: &Message) -> serenity::Result<()> {
+    fn get_usage(&self) -> &'static str {
+        "$say ...message"
+    }
+
+    async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()> {
         let args = args(msg);
 
         msg.channel_id

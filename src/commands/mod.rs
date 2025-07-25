@@ -1,3 +1,4 @@
+mod help_command;
 mod mute_command;
 mod say_command;
 mod unmute_command;
@@ -7,13 +8,17 @@ use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use std::collections::HashMap;
 
+pub use help_command::HelpHandler;
 pub use mute_command::MuteHandler;
 pub use say_command::SayHandler;
 pub use unmute_command::UnmuteHandler;
 
+use crate::Handler;
+
 #[async_trait]
 pub trait CommandHandler: Send + Sync {
-    async fn handle(&self, ctx: &Context, msg: &Message) -> serenity::Result<()>;
+    async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> serenity::Result<()>;
+    fn get_usage(&self) -> &'static str;
 }
 
 pub struct CommandHandlerRegistry {
@@ -33,13 +38,14 @@ impl CommandHandlerRegistry {
 
     pub async fn process_command(
         &self,
+        state: &Handler,
         ctx: &Context,
         msg: &Message,
         name: &String,
     ) -> serenity::Result<()> {
         match self.handlers.get(name.as_str()) {
-            Some(handler) => {
-                if let Err(err) = handler.handle(ctx, msg).await {
+            Some(ch) => {
+                if let Err(err) = ch.handle(state, ctx, msg).await {
                     eprintln!("Error in command handler {name}: {err:?}");
                 }
             }
