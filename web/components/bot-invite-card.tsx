@@ -26,7 +26,7 @@ function useHasBotQuery(props: { guildId: string | null }) {
       if (!props.guildId) {
         res = false;
       } else {
-        res = await fetch(`${url}/api/guild/has-bo`, {
+        res = await fetch(`${url}/api/guild/has-bot`, {
           body: JSON.stringify({ guildId: props.guildId }),
           headers: { "Content-Type": "application/json" },
           method: "POST",
