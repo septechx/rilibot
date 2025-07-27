@@ -22,6 +22,8 @@ impl MessageHandler for CommandHandler {
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
         let cmd: Vec<_> = msg.content.strip_prefix("$").unwrap().split(' ').collect();
 
+        println!("Handling command: {}", &cmd[0]);
+
         if !cmd.is_empty() {
             state
                 .command_handlers

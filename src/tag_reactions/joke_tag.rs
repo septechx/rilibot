@@ -22,6 +22,11 @@ impl JokeReplyHook {
 #[async_trait]
 impl Hook for JokeReplyHook {
     async fn run(&self, _state: &Handler, ctx: &Context, msg: &Message) -> bool {
+        println!(
+            "Running joke hook, state: {}, message: {}",
+            self.joke_channel_id, msg.channel_id
+        );
+
         if self.joke_channel_id == msg.channel_id {
             msg.channel_id
                 .say(&ctx.http, "Como que el otro?")

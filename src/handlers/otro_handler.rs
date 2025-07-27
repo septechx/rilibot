@@ -20,6 +20,8 @@ impl MessageHandler for OtroHandler {
     }
 
     async fn handle(&self, _handler: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+        println!("El otro handler called");
+
         msg.channel_id.say(&ctx.http, "Como que el otro?").await?;
 
         Ok(())

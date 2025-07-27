@@ -20,6 +20,8 @@ impl MessageHandler for TagHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+        println!("Handling tag");
+
         state.tag_handlers.process_message(state, ctx, msg).await;
 
         Ok(())
