@@ -25,7 +25,7 @@ services:
   dashboard:
     build:
       context: web/
-      dockerfile: web/Dockerfile
+      dockerfile: Dockerfile
     environment:
       - COOLIFY_FQDN=${COOLIFY_FQDN}
       - NEXT_PUBLIC_DISCORD_CLIENT_ID=${NEXT_PUBLIC_DISCORD_CLIENT_ID}
