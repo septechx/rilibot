@@ -22,13 +22,13 @@ export function DiscordLoginForm() {
   }
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50 backdrop-blur-sm shadow-2xl">
-      <CardHeader className="text-center space-y-4">
-        <div className="mx-auto w-16 h-16 bg-[#5865F2] rounded-full flex items-center justify-center">
+    <Card className="border-slate-700 bg-slate-800/50 shadow-2xl backdrop-blur-sm">
+      <CardHeader className="space-y-4 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#5865F2]">
           <img
             src="/beaver.png"
             alt="logo"
-            className="w-full h-full object-cover rounded-lg"
+            className="h-full w-full rounded-lg object-cover"
           />
         </div>
         <CardTitle className="text-2xl font-bold text-white">
@@ -41,7 +41,7 @@ export function DiscordLoginForm() {
       <CardContent className="space-y-6">
         <Button
           onClick={handleDiscordLogin}
-          className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-3"
+          className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#5865F2] px-4 py-3 font-semibold text-white transition-colors duration-200 hover:bg-[#4752C4]"
           size="lg"
         >
           <svg
@@ -58,11 +58,11 @@ export function DiscordLoginForm() {
 
         <div className="text-center">
           <p className="text-sm text-slate-400">
-            By signing in, you agree to our
+            By signing in, you agree to our{" "}
             <a href="#" className="underline">
               terms of service
             </a>
-            <br /> and
+            <br /> and{" "}
             <a href="#" className="underline">
               privacy policy
             </a>
