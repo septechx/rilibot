@@ -1,6 +1,7 @@
 mod commands;
 mod db;
 mod handlers;
+mod structs;
 mod tag_reactions;
 
 use anyhow::Result;
@@ -10,11 +11,13 @@ use serenity::{
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
+use tokio::sync::Mutex;
 
-use std::env;
+use std::{env, sync::Arc};
 
 use commands::{CommandHandlerRegistry, HelpHandler, MuteHandler, SayHandler, UnmuteHandler};
 use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler, TagHandler};
+use structs::Hook;
 use tag_reactions::{JokeHandler, TagHandlerRegistry};
 
 lazy_static! {
@@ -25,6 +28,7 @@ lazy_static! {
 
 pub struct Handler {
     db_client: tokio_postgres::Client,
+    hooks: Arc<Mutex<Vec<Box<dyn Hook>>>>,
     message_handlers: MessageHandlerRegistry,
     command_handlers: CommandHandlerRegistry,
     tag_handlers: TagHandlerRegistry,
@@ -48,16 +52,26 @@ impl Handler {
 
         Self {
             db_client: clt,
+            hooks: Arc::new(Mutex::new(Vec::new())),
             message_handlers: mhr,
             tag_handlers: thr,
             command_handlers: chr,
         }
+    }
+
+    pub fn get_hooks(&self) -> Arc<Mutex<Vec<Box<dyn Hook>>>> {
+        Arc::clone(&self.hooks)
     }
 }
 
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
+        let mut hooks = self.hooks.lock().await;
+        hooks.retain(|hook| {
+            tokio::runtime::Handle::current().block_on(async { !hook.run(self, &ctx, &msg).await })
+        });
+
         self.message_handlers
             .process_message(self, &ctx, &msg)
             .await;
