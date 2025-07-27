@@ -1,0 +1,1 @@
+ALTER TABLE "mod_roles" ADD CONSTRAINT "mod_roles_guild_id_unique" UNIQUE("guild_id");

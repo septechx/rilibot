@@ -3,24 +3,28 @@ use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use crate::Handler;
 
-use super::MessageHandler;
+use super::TagHandler;
 
-pub struct OtroHandler;
+pub struct JokeHandler;
 
-impl OtroHandler {
+impl JokeHandler {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl MessageHandler for OtroHandler {
+impl TagHandler for JokeHandler {
     fn should_handle(&self, msg: &Message) -> bool {
-        !msg.author.bot && msg.content.to_lowercase().contains("otro")
+        msg.content
+            .to_lowercase()
+            .contains("cuentame un chiste chistoso")
     }
 
     async fn handle(&self, _handler: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        msg.channel_id.say(&ctx.http, "Como que el otro?").await?;
+        msg.channel_id
+            .say(&ctx.http, "Que le dice un pez al otro?")
+            .await?;
 
         Ok(())
     }
