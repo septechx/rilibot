@@ -16,9 +16,10 @@ impl JokeHandler {
 #[async_trait]
 impl TagHandler for JokeHandler {
     fn should_handle(&self, msg: &Message) -> bool {
-        msg.content
-            .to_lowercase()
-            .contains("cuentame un chiste chistoso")
+        let msg = msg.content
+            .to_lowercase();
+        msg.contains("chistoso") && msg.contains("chiste")
+            
     }
 
     async fn handle(&self, _handler: &Handler, ctx: &Context, msg: &Message) -> Result<()> {

@@ -1,4 +1,4 @@
 export const url =
   process.env.NODE_ENV === "production"
-    ? process.env.COOLIFY_FQDN!
+    ? process.env.SERVICE_DASHBOARD_FQDN!
     : "http://localhost:3001";

@@ -27,7 +27,7 @@ services:
       context: web/
       dockerfile: Dockerfile
     environment:
-      - COOLIFY_FQDN=${COOLIFY_FQDN}
+      - SERVICE_DASHBOARD_FQDN=${SERVICE_DASHBOARD_FQDN}
       - NEXT_PUBLIC_DISCORD_CLIENT_ID=${NEXT_PUBLIC_DISCORD_CLIENT_ID}
       - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
@@ -52,6 +52,8 @@ services:
     depends_on:
       bot-db:
         condition: service_healthy
+    ports:
+      - "3000:3000"
 
   bot-db:
     image: postgres:16-alpine
