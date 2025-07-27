@@ -52,8 +52,6 @@ services:
     depends_on:
       bot-db:
         condition: service_healthy
-    ports:
-      - "3030:3000"
 
   bot-db:
     image: postgres:16-alpine
