@@ -1,4 +1,5 @@
 import { modRoles } from "@/db/schema";
+import { authorize } from "@/lib/auth";
 import { validateToken } from "@/lib/crypto";
 import { db } from "@/lib/server/db";
 import { eq } from "drizzle-orm";
@@ -11,11 +12,13 @@ export async function POST(request: NextRequest) {
   const encryptedToken = cookieStore.get("api_token")?.value;
   const iv = cookieStore.get("iv")?.value;
   const { guildId } = await request.json();
+  const authorized = await authorize(guildId);
 
   if (
     !token ||
     !encryptedToken ||
     !iv ||
+    !authorized ||
     !validateToken(encryptedToken, iv, token)
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
