@@ -67,14 +67,21 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        let mut hooks = self.hooks.lock().await;
-        hooks.retain(|hook| {
-            tokio::runtime::Handle::current().block_on(async { !hook.run(self, &ctx, &msg).await })
-        });
-
         self.message_handlers
             .process_message(self, &ctx, &msg)
             .await;
+
+        let mut hooks = self.hooks.lock().await;
+
+        let mut remaining_hooks = Vec::new();
+
+        for hook in hooks.drain(..) {
+            if !hook.run(self, &ctx, &msg).await {
+                remaining_hooks.push(hook);
+            }
+        }
+
+        *hooks = remaining_hooks;
     }
 
     async fn ready(&self, _ctx: Context, ready: Ready) {
