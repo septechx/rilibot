@@ -33,7 +33,7 @@ impl TagHandlerRegistry {
         for ch in &self.handlers {
             if ch.should_handle(msg) {
                 if let Err(err) = ch.handle(handler, ctx, msg).await {
-                    eprintln!("Error in tag handler: {err:?}");
+                    eprintln!("[ERROR] Error in tag handler: {err:?}");
                 }
             }
         }

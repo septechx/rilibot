@@ -1209,7 +1209,7 @@ dependencies = [
 
 [[package]]
 name = "rilibot"
-version = "3.1.6"
+version = "3.2.0"
 dependencies = [
  "anyhow",
  "lazy_static",

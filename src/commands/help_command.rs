@@ -1,20 +1,20 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{args, send_error, usage, CommandHandler};
+use super::{CommandHandler, args, send_error, usage};
 
 use crate::Handler;
 
-pub struct HelpHandler;
+pub struct HelpCommand;
 
-impl HelpHandler {
+impl HelpCommand {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl CommandHandler for HelpHandler {
+impl CommandHandler for HelpCommand {
     fn get_usage(&self) -> &'static str {
         "$help (command)"
     }

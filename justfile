@@ -1,7 +1,4 @@
-set shell := ["bash", "-cu"]
+set dotenv-load
 
 run:
-    set -a
-    source .env
-    set +a
     cargo run

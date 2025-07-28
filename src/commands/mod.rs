@@ -1,21 +1,23 @@
 mod help_command;
 mod mute_command;
+mod role_command;
 mod say_command;
 mod unmute_command;
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use serenity::model::id::RoleId;
 use std::collections::HashMap;
 
-pub use help_command::HelpHandler;
-pub use mute_command::MuteHandler;
-pub use say_command::SayHandler;
-pub use unmute_command::UnmuteHandler;
+pub use help_command::HelpCommand;
+pub use mute_command::MuteCommand;
+pub use role_command::RoleCommand;
+pub use say_command::SayCommand;
+pub use unmute_command::UnmuteCommand;
 
-use crate::db::queries;
 use crate::Handler;
+use crate::db::queries;
 
 #[async_trait]
 pub trait CommandHandler: Send + Sync {
@@ -48,11 +50,11 @@ impl CommandHandlerRegistry {
         match self.handlers.get(name.as_str()) {
             Some(ch) => {
                 if let Err(err) = ch.handle(state, ctx, msg).await {
-                    eprintln!("Error in command handler {name}: {err:?}");
+                    eprintln!("[ERROR] Error in command handler {name}: {err:?}");
                 }
             }
             None => {
-                eprintln!("Command not found: {name}");
+                eprintln!("[WARN] Command not found: {name}");
             }
         };
 

@@ -1,20 +1,20 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{args, CommandHandler};
+use super::{CommandHandler, args};
 
 use crate::Handler;
 
-pub struct SayHandler;
+pub struct SayCommand;
 
-impl SayHandler {
+impl SayCommand {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl CommandHandler for SayHandler {
+impl CommandHandler for SayCommand {
     fn get_usage(&self) -> &'static str {
         "$say ...message"
     }

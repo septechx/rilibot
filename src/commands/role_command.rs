@@ -1,22 +1,22 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{assert_mod, send_error, send_usage, usage, CommandHandler};
-
 use crate::Handler;
 
-pub struct UnmuteCommand;
+use super::{assert_mod, send_error, send_usage, usage, CommandHandler};
 
-impl UnmuteCommand {
+pub struct RoleCommand;
+
+impl RoleCommand {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl CommandHandler for UnmuteCommand {
+impl CommandHandler for RoleCommand {
     fn get_usage(&self) -> &'static str {
-        "$unmute @user"
+        "$role @user @role"
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
@@ -29,6 +29,11 @@ impl CommandHandler for UnmuteCommand {
             None => return send_usage(ctx, msg, usage(usage_s).to_string()).await,
         };
 
+        let role_id = match msg.mention_roles.first() {
+            Some(role) => role,
+            None => return send_usage(ctx, msg, usage(usage_s).to_string()).await,
+        };
+
         let guild_id = match msg.guild_id {
             Some(g) => g,
             None => {
@@ -37,15 +42,15 @@ impl CommandHandler for UnmuteCommand {
             }
         };
 
-        if let Ok(mut member) = guild_id.member(&ctx.http, user_id).await {
-            match member.enable_communication(&ctx.http).await {
+        if let Ok(member) = guild_id.member(&ctx.http, user_id).await {
+            match member.add_role(&ctx.http, role_id).await {
                 Ok(_) => {
                     msg.channel_id
-                        .say(&ctx.http, format!("Unmuted <@{user_id}>."))
+                        .say(&ctx.http, format!("Gave <@{role_id}> to <@{user_id}>."))
                         .await?;
                 }
                 Err(err) => {
-                    send_error(ctx, msg, &format!("Failed to unmute user: {err:?}")).await?;
+                    send_error(ctx, msg, &format!("Failed to give role: {err:?}")).await?;
                 }
             }
         }

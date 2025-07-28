@@ -1,20 +1,20 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use serenity::{all::Timestamp, async_trait, model::channel::Message, prelude::*};
 
 use crate::Handler;
 
-use super::{args_checked, assert_mod, send_error, send_usage, usage, CommandHandler};
+use super::{CommandHandler, args_checked, assert_mod, send_error, send_usage, usage};
 
-pub struct MuteHandler;
+pub struct MuteCommand;
 
-impl MuteHandler {
+impl MuteCommand {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl CommandHandler for MuteHandler {
+impl CommandHandler for MuteCommand {
     fn get_usage(&self) -> &'static str {
         "$mute @user duration"
     }

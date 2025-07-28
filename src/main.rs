@@ -16,7 +16,9 @@ use tokio::sync::Mutex;
 
 use std::{env, sync::Arc};
 
-use commands::{CommandHandlerRegistry, HelpHandler, MuteHandler, SayHandler, UnmuteHandler};
+use commands::{
+    CommandHandlerRegistry, HelpCommand, MuteCommand, RoleCommand, SayCommand, UnmuteCommand,
+};
 use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler, TagHandler};
 use structs::Hook;
 use tag_reactions::{JokeHandler, TagHandlerRegistry};
@@ -46,10 +48,11 @@ impl Handler {
         thr.register(JokeHandler::new());
 
         let mut chr = CommandHandlerRegistry::new();
-        chr.register("say", SayHandler::new());
-        chr.register("mute", MuteHandler::new());
-        chr.register("unmute", UnmuteHandler::new());
-        chr.register("help", HelpHandler::new());
+        chr.register("say", SayCommand::new());
+        chr.register("mute", MuteCommand::new());
+        chr.register("unmute", UnmuteCommand::new());
+        chr.register("help", HelpCommand::new());
+        chr.register("role", RoleCommand::new());
 
         Self {
             db_client: clt,
