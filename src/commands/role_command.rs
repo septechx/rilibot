@@ -46,7 +46,7 @@ impl CommandHandler for RoleCommand {
             match member.add_role(&ctx.http, role_id).await {
                 Ok(_) => {
                     msg.channel_id
-                        .say(&ctx.http, format!("Gave <@{role_id}> to <@{user_id}>."))
+                        .say(&ctx.http, format!("Gave <@&{role_id}> to <@{user_id}>."))
                         .await?;
                 }
                 Err(err) => {
