@@ -18,6 +18,7 @@ use std::{env, sync::Arc};
 
 use commands::{
     CommandHandlerRegistry, HelpCommand, MuteCommand, RoleCommand, SayCommand, UnmuteCommand,
+    VanCommand,
 };
 use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler, TagHandler};
 use structs::Hook;
@@ -53,6 +54,7 @@ impl Handler {
         chr.register("unmute", UnmuteCommand::new());
         chr.register("help", HelpCommand::new());
         chr.register("role", RoleCommand::new());
+        chr.register("van", VanCommand::new());
 
         Self {
             db_client: clt,

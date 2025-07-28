@@ -3,8 +3,9 @@ mod mute_command;
 mod role_command;
 mod say_command;
 mod unmute_command;
+mod van_command;
 
-use anyhow::{Result, anyhow, bail};
+use anyhow::{anyhow, bail, Result};
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
 use serenity::model::id::RoleId;
@@ -15,9 +16,10 @@ pub use mute_command::MuteCommand;
 pub use role_command::RoleCommand;
 pub use say_command::SayCommand;
 pub use unmute_command::UnmuteCommand;
+pub use van_command::VanCommand;
 
-use crate::Handler;
 use crate::db::queries;
+use crate::Handler;
 
 #[async_trait]
 pub trait CommandHandler: Send + Sync {
