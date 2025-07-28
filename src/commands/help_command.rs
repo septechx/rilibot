@@ -20,8 +20,6 @@ impl CommandHandler for HelpHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        println!("Handling say");
-
         let usage_s = self.get_usage();
         let args = args(msg);
 

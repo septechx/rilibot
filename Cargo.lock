@@ -1209,10 +1209,11 @@ dependencies = [
 
 [[package]]
 name = "rilibot"
-version = "3.1.3"
+version = "3.1.4"
 dependencies = [
  "anyhow",
  "lazy_static",
+ "log",
  "serenity",
  "tokio",
  "tokio-postgres",

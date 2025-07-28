@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use crate::Handler;
+use crate::{log, Handler};
 
 use super::MessageHandler;
 
@@ -20,7 +20,7 @@ impl MessageHandler for OtroHandler {
     }
 
     async fn handle(&self, _handler: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        println!("El otro handler called");
+        log::handler("Otro");
 
         msg.channel_id.say(&ctx.http, "Como que el otro?").await?;
 

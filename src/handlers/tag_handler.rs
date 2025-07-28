@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use crate::{Handler, CLIENT_ID};
+use crate::{log, Handler, CLIENT_ID};
 
 use super::MessageHandler;
 
@@ -20,7 +20,7 @@ impl MessageHandler for TagHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        println!("Handling tag");
+        log::handler("Tag");
 
         state.tag_handlers.process_message(state, ctx, msg).await;
 

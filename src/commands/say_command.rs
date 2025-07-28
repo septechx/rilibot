@@ -20,8 +20,6 @@ impl CommandHandler for SayHandler {
     }
 
     async fn handle(&self, _state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        println!("Handling say");
-
         let args = args(msg);
 
         msg.channel_id

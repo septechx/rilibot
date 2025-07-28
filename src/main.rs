@@ -1,6 +1,7 @@
 mod commands;
 mod db;
 mod handlers;
+mod log;
 mod structs;
 mod tag_reactions;
 

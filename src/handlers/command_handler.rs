@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use crate::Handler;
+use crate::{log, Handler};
 
 use super::MessageHandler;
 
@@ -20,9 +20,11 @@ impl MessageHandler for CommandHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
+        log::handler("Command");
+
         let cmd: Vec<_> = msg.content.strip_prefix("$").unwrap().split(' ').collect();
 
-        println!("Handling command: {}", &cmd[0]);
+        log::command(cmd[0]);
 
         if !cmd.is_empty() {
             state

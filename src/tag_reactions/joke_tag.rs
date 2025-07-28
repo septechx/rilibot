@@ -5,10 +5,11 @@ use serenity::{
     prelude::*,
 };
 
-use crate::{structs::Hook, Handler};
+use crate::{log, structs::Hook, Handler};
 
 use super::TagHandler;
 
+#[derive(Debug)]
 pub struct JokeReplyHook {
     joke_channel_id: ChannelId,
 }
@@ -22,10 +23,7 @@ impl JokeReplyHook {
 #[async_trait]
 impl Hook for JokeReplyHook {
     async fn run(&self, _state: &Handler, ctx: &Context, msg: &Message) -> bool {
-        println!(
-            "Running joke hook, state: {}, message: {}",
-            self.joke_channel_id, msg.channel_id
-        );
+        log::hook("JokeReply", self);
 
         if self.joke_channel_id == msg.channel_id && !msg.author.bot {
             msg.channel_id

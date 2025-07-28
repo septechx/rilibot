@@ -20,8 +20,6 @@ impl CommandHandler for MuteHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        println!("Handling mute");
-
         assert_mod(state, ctx, msg).await?;
 
         let usage_s = self.get_usage();
