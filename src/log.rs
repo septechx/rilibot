@@ -1,15 +1,17 @@
 use std::fmt::Debug;
 
-use log::info;
-
 pub fn hook(name: &str, state: impl Debug) {
-    info!("Hook {name} with state {state:?} called");
+    println!("[INFO] Hook {name} with state {state:?} called");
 }
 
 pub fn handler(name: &str) {
-    info!("Handler {name} called");
+    println!("[INFO] Handler {name} called");
 }
 
 pub fn command(name: &str) {
-    info!("Command {name} called");
+    println!("[INFO] Command {name} called");
+}
+
+pub fn info(message: &str) {
+    println!("[INFO] {message}");
 }
