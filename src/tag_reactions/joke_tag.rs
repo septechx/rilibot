@@ -27,7 +27,7 @@ impl Hook for JokeReplyHook {
             self.joke_channel_id, msg.channel_id
         );
 
-        if self.joke_channel_id == msg.channel_id {
+        if self.joke_channel_id == msg.channel_id && !msg.author.bot {
             msg.channel_id
                 .say(&ctx.http, "Como que el otro?")
                 .await
