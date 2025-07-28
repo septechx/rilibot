@@ -1,4 +1,4 @@
-import { Atom } from "nanostores";
+import { WritableAtom } from "nanostores";
 
 export interface DiscordGuild {
   id: string;
@@ -30,5 +30,5 @@ export interface DashboardContextType {
   selectedGuild: string | null;
   setSelectedGuild: (id: string | null) => void;
   loading: boolean;
-  $cardLock: Atom<boolean>;
+  $cardLock: WritableAtom<boolean>;
 }
