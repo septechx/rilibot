@@ -16,7 +16,7 @@ impl RoleCommand {
 #[async_trait]
 impl CommandHandler for RoleCommand {
     fn get_usage(&self) -> &'static str {
-        "$role @user @role"
+        "$role ...@user ...@role"
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
@@ -24,15 +24,10 @@ impl CommandHandler for RoleCommand {
 
         let usage_s = self.get_usage();
 
-        let user_id = match msg.mentions.first() {
-            Some(user) => user.id,
-            None => return send_usage(ctx, msg, usage(usage_s).to_string()).await,
-        };
-
-        let role_id = match msg.mention_roles.first() {
-            Some(role) => role,
-            None => return send_usage(ctx, msg, usage(usage_s).to_string()).await,
-        };
+        let user_ids = msg.mentions.iter().map(|user| user.id).collect::<Vec<_>>();
+        if user_ids.is_empty() || msg.mention_roles.is_empty() {
+            return send_usage(ctx, msg, usage(usage_s).to_string()).await;
+        }
 
         let guild_id = match msg.guild_id {
             Some(g) => g,
@@ -42,15 +37,24 @@ impl CommandHandler for RoleCommand {
             }
         };
 
-        if let Ok(member) = guild_id.member(&ctx.http, user_id).await {
-            match member.add_role(&ctx.http, role_id).await {
-                Ok(_) => {
-                    msg.channel_id
-                        .say(&ctx.http, format!("Gave <@&{role_id}> to <@{user_id}>."))
-                        .await?;
-                }
-                Err(err) => {
-                    send_error(ctx, msg, &format!("Failed to give role: {err:?}")).await?;
+        for user_id in user_ids {
+            if let Ok(member) = guild_id.member(&ctx.http, user_id).await {
+                for role_id in &msg.mention_roles {
+                    match member.add_role(&ctx.http, role_id).await {
+                        Ok(_) => {
+                            msg.channel_id
+                                .say(&ctx.http, format!("Gave <@&{role_id}> to <@{user_id}>."))
+                                .await?;
+                        }
+                        Err(_) => {
+                            send_error(
+                                ctx,
+                                msg,
+                                &format!("Failed to give <@&{role_id}> to <@{user_id}>."),
+                            )
+                            .await?;
+                        }
+                    }
                 }
             }
         }

@@ -44,8 +44,8 @@ impl CommandHandler for UnmuteCommand {
                         .say(&ctx.http, format!("Unmuted <@{user_id}>."))
                         .await?;
                 }
-                Err(err) => {
-                    send_error(ctx, msg, &format!("Failed to unmute user: {err:?}")).await?;
+                Err(_) => {
+                    send_error(ctx, msg, &format!("Failed to unmute user <@{user_id}>.")).await?;
                 }
             }
         }

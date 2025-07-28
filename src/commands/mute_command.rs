@@ -1,9 +1,9 @@
-use anyhow::{Result, anyhow, bail};
+use anyhow::{anyhow, bail, Result};
 use serenity::{all::Timestamp, async_trait, model::channel::Message, prelude::*};
 
 use crate::Handler;
 
-use super::{CommandHandler, args_checked, assert_mod, send_error, send_usage, usage};
+use super::{args_checked, assert_mod, send_error, send_usage, usage, CommandHandler};
 
 pub struct MuteCommand;
 
@@ -63,8 +63,8 @@ impl CommandHandler for MuteCommand {
                         .say(&ctx.http, format!("Muted <@{user_id}> for {duration_str}."))
                         .await?;
                 }
-                Err(err) => {
-                    send_error(ctx, msg, &format!("Failed to mute user: {err:?}")).await?;
+                Err(_) => {
+                    send_error(ctx, msg, &format!("Failed to mute <@{user_id}>.")).await?;
                 }
             }
         }
