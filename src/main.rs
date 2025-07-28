@@ -5,6 +5,7 @@ mod log;
 mod structs;
 mod tag_reactions;
 
+use ::log::info;
 use anyhow::Result;
 use lazy_static::lazy_static;
 use serenity::{
@@ -86,12 +87,14 @@ impl EventHandler for Handler {
     }
 
     async fn ready(&self, _ctx: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
+        info!("{} is connected!", ready.user.name);
     }
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    pretty_env_logger::init();
+
     let intents = GatewayIntents::all();
 
     let db_client = db::connect().await?;
