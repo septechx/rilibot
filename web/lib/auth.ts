@@ -1,3 +1,4 @@
+import { url } from "./consts";
 import { DiscordGuild } from "./types";
 
 export function canManageGuild(guild: DiscordGuild) {
@@ -10,7 +11,7 @@ export function canManageGuild(guild: DiscordGuild) {
 }
 
 export async function authorize(guildId: string) {
-  const response = await fetch("/api/user/guilds");
+  const response = await fetch(`${url}/api/user/guilds`);
   if (!response.ok) {
     return false;
   }
