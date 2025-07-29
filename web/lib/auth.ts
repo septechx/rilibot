@@ -11,14 +11,24 @@ export function canManageGuild(guild: DiscordGuild) {
 }
 
 export async function authorize(guildId: string, accessToken: string) {
-  let guilds: DiscordGuild[];
+  let guilds: DiscordGuild[] | undefined = undefined;
 
-  try {
-    guilds = await fetchGuilds(accessToken).then((res) => res.guilds);
-  } catch {
+  // Discord's api isn't consistent at ALL so try 50 times to get the information
+  for (let i = 0; i < 50; ++i) {
+    try {
+      guilds = await fetchGuilds(accessToken).then((res) => res.guilds);
+      break;
+    } catch {
+      continue;
+    }
+  }
+
+  if (!guilds) {
     return false;
   }
 
-  guilds.filter(canManageGuild).filter((guild) => guild.id == guildId)
-    .length === 1;
+  return (
+    guilds.filter(canManageGuild).filter((guild) => guild.id == guildId)
+      .length === 1
+  );
 }

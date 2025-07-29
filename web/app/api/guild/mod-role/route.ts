@@ -47,14 +47,18 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("refresh_token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
   const encryptedToken = cookieStore.get("api_token")?.value;
   const iv = cookieStore.get("iv")?.value;
   const { guildId, roleId } = await request.json();
+  const authorized = await authorize(guildId, accessToken ?? "");
 
   if (
     !token ||
     !encryptedToken ||
     !iv ||
+    !accessToken ||
+    !authorized ||
     !validateToken(encryptedToken, iv, token)
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -41,7 +41,7 @@ export function DiscordLoginForm() {
       <CardContent className="space-y-6">
         <Button
           onClick={handleDiscordLogin}
-          className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#5865F2] px-4 py-3 font-semibold text-white transition-colors duration-200 hover:bg-[#4752C4]"
+          className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg bg-[#5865F2] px-4 py-3 font-semibold text-white transition-colors duration-200 hover:bg-[#4752C4]"
           size="lg"
         >
           <svg
