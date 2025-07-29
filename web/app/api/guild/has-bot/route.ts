@@ -1,5 +1,6 @@
 import { authorize } from "@/lib/auth";
 import { validateToken } from "@/lib/crypto";
+import { CLIENT_ID } from "@/rilibot.config";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   const res = await fetch(
-    `https://discord.com/api/v10/guilds/${guildId}/members/${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!}`,
+    `https://discord.com/api/v10/guilds/${guildId}/members/${CLIENT_ID}`,
     {
       headers: {
         Authorization: `Bot ${process.env.DISCORD_TOKEN!}`,

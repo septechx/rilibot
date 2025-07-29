@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { OptionJSON, Option } from "./utils";
+import { DASH_URL } from "@/rilibot.config";
 
 export function useModRoleQuery(props: { guildId: string | null }) {
   const query = useSuspenseQuery({
@@ -10,14 +11,11 @@ export function useModRoleQuery(props: { guildId: string | null }) {
       if (props.guildId === null) {
         res = Option.none<string>().toJSON();
       } else {
-        res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL!}/api/guild/mod-role`,
-          {
-            body: JSON.stringify({ guildId: props.guildId }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-          },
-        )
+        res = await fetch(`${DASH_URL}/api/guild/mod-role`, {
+          body: JSON.stringify({ guildId: props.guildId }),
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+        })
           .then(async (__res) => {
             if (__res.status === 200) {
               const body = await __res.json();

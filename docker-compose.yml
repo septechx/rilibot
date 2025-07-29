@@ -27,9 +27,6 @@ services:
       context: web/
       dockerfile: Dockerfile
     environment:
-      # Coolify is broken so you will have to modify these manually.
-      - NEXT_PUBLIC_URL=https://rb.siesque.com
-      - NEXT_PUBLIC_DISCORD_CLIENT_ID=1271595323659255828
       - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - DATABASE_URL=${DATABASE_URL}

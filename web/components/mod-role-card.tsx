@@ -29,6 +29,7 @@ import { Option } from "@/lib/utils";
 import { useDashboardContext } from "@/lib/dashboard-context";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
+import { DASH_URL } from "@/rilibot.config";
 
 type ModRoleCardProps = {
   selectedGuild: string | null;
@@ -43,7 +44,7 @@ function useRolesQuery(props: { guildId: string | null }) {
       if (props.guildId === null) {
         res = [];
       } else {
-        res = await fetch(`${process.env.NEXT_PUBLIC_URL!}/api/guild/roles`, {
+        res = await fetch(`${DASH_URL}/api/guild/roles`, {
           body: JSON.stringify({ guildId: props.guildId }),
           headers: { "Content-Type": "application/json" },
           method: "POST",
@@ -73,7 +74,7 @@ function ModRoleCardContent({ selectedGuild }: ModRoleCardProps) {
 
   const mutation = useMutation<void, DefaultError, string>({
     mutationFn: (newRoleId: string) =>
-      fetch(`${process.env.NEXT_PUBLIC_URL!}/api/guild/mod-role`, {
+      fetch(`${DASH_URL}/api/guild/mod-role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ guildId: selectedGuild, roleId: newRoleId }),

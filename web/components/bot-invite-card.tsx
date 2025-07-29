@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useDashboardContext } from "@/lib/dashboard-context";
+import { DASH_URL } from "@/rilibot.config";
 
 type BotInviteCardProps = {
   selectedGuild: string | null;
@@ -24,7 +25,7 @@ function useHasBotQuery(props: { guildId: string | null }) {
       if (!props.guildId) {
         res = false;
       } else {
-        res = await fetch(`${process.env.NEXT_PUBLIC_URL!}/api/guild/has-bot`, {
+        res = await fetch(`${DASH_URL}/api/guild/has-bot`, {
           body: JSON.stringify({ guildId: props.guildId }),
           headers: { "Content-Type": "application/json" },
           method: "POST",

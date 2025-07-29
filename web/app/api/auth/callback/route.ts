@@ -1,4 +1,5 @@
 import { encryptToken } from "@/lib/crypto";
+import { CLIENT_ID, DASH_URL } from "@/rilibot.config";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,11 +25,11 @@ export async function GET(request: NextRequest) {
   const token_params = new URLSearchParams({
     grant_type: "authorization_code",
     code,
-    redirect_uri: `${process.env.NEXT_PUBLIC_URL!}/api/auth/callback`,
+    redirect_uri: `${DASH_URL}/api/auth/callback`,
   });
 
   const basicAuth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!}:${process.env.DISCORD_CLIENT_SECRET!}`,
+    `${CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET!}`,
   ).toString("base64");
 
   const token = await fetch("https://discord.com/api/oauth2/token", {
@@ -51,9 +52,7 @@ export async function GET(request: NextRequest) {
   const apiSecret = process.env.API_SECRET!;
   const { encryptedToken, iv } = encryptToken(refresh_token, apiSecret);
 
-  const response = NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_URL!}/dashboard`,
-  );
+  const response = NextResponse.redirect(`${DASH_URL}/dashboard`);
   response.headers.append(
     "Set-Cookie",
     `access_token=${access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${expires_in}`,

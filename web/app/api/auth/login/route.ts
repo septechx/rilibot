@@ -1,3 +1,4 @@
+import { CLIENT_ID, DASH_URL } from "@/rilibot.config";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,8 +9,8 @@ export async function GET(request: NextRequest) {
   }
 
   const params = new URLSearchParams({
-    client_id: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!,
-    redirect_uri: `${process.env.NEXT_PUBLIC_URL!}/api/auth/callback`,
+    client_id: CLIENT_ID,
+    redirect_uri: `${DASH_URL}/api/auth/callback`,
     response_type: "code",
     prompt: "consent",
     scope: "identify guilds",
