@@ -1,4 +1,3 @@
-import { url } from "@/lib/consts";
 import { encryptToken } from "@/lib/crypto";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -25,7 +24,7 @@ export async function GET(request: NextRequest) {
   const token_params = new URLSearchParams({
     grant_type: "authorization_code",
     code,
-    redirect_uri: `${url}/api/auth/callback`,
+    redirect_uri: `${process.env.NEXT_PUBLIC_URL!}/api/auth/callback`,
   });
 
   const basicAuth = Buffer.from(
@@ -52,7 +51,9 @@ export async function GET(request: NextRequest) {
   const apiSecret = process.env.API_SECRET!;
   const { encryptedToken, iv } = encryptToken(refresh_token, apiSecret);
 
-  const response = NextResponse.redirect(`${url}/dashboard`);
+  const response = NextResponse.redirect(
+    `${process.env.NEXT_PUBLIC_URL!}/dashboard`,
+  );
   response.headers.append(
     "Set-Cookie",
     `access_token=${access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${expires_in}`,

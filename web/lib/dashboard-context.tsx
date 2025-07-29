@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { atom } from "nanostores";
 import { DashboardContextType, DiscordGuild, DiscordUser } from "./types";
 import { canManageGuild } from "./auth";
-import { url } from "./consts";
 
 const $cardLock = atom<boolean>(true);
 
@@ -26,7 +25,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`${url}/api/user/guilds`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL!}/api/user/guilds`,
+      );
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
