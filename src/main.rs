@@ -8,6 +8,7 @@ mod tag_reactions;
 use anyhow::Result;
 use lazy_static::lazy_static;
 use serenity::{
+    all::ActivityData,
     async_trait,
     model::{channel::Message, gateway::Ready},
     prelude::*,
@@ -73,7 +74,7 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        // Process hooks firs to avoid a hook being called on the same message it was spawned from
+        // Process hooks first to avoid a hook being called on the same message it was spawned from
         let mut hooks = self.hooks.lock().await;
         let mut remaining_hooks = Vec::new();
         for hook in hooks.drain(..) {
@@ -101,6 +102,7 @@ async fn main() -> Result<()> {
 
     let mut client = Client::builder(&*TOKEN, intents)
         .event_handler(Handler::new(db_client))
+        .activity(ActivityData::playing("rb.siesque.com | $help"))
         .await?;
 
     client.start().await?;
