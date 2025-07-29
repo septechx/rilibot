@@ -25,11 +25,17 @@ import {
   DefaultError,
 } from "@tanstack/react-query";
 import { useModRoleQuery } from "@/lib/queries";
-import { Option } from "@/lib/utils";
 import { useDashboardContext } from "@/lib/dashboard-context";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
 import { DASH_URL } from "@/rilibot.config";
+import { Shield } from "lucide-react";
+
+interface DiscordRole {
+  id: string;
+  name: string;
+  color: number;
+}
 
 type ModRoleCardProps = {
   selectedGuild: string | null;
@@ -37,40 +43,34 @@ type ModRoleCardProps = {
 
 function useRolesQuery(props: { guildId: string | null }) {
   const query = useSuspenseQuery({
-    queryKey: ["roles", props.guildId],
+    queryKey: ["guild", props.guildId, "roles"],
     queryFn: async () => {
-      let res;
+      if (!props.guildId) return [];
 
-      if (props.guildId === null) {
-        res = [];
-      } else {
-        res = await fetch(`${DASH_URL}/api/guild/roles`, {
-          body: JSON.stringify({ guildId: props.guildId }),
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-        }).then(async (__res) => {
-          if (__res.ok) {
-            const body = await __res.json();
-            return body.roles;
-          }
-          return [];
-        });
-      }
+      const res = await fetch(`${DASH_URL}/api/guild/roles`, {
+        body: JSON.stringify({ guildId: props.guildId }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
 
-      return res;
+      if (!res.ok) return [];
+
+      const data = await res.json();
+      return Array.isArray(data.roles) ? data.roles : [];
     },
   });
 
-  return [query.data as any[], query] as const;
+  return [query.data as DiscordRole[], query] as const;
 }
 
 function ModRoleCardContent({ selectedGuild }: ModRoleCardProps) {
   const queryClient = useQueryClient();
-  const [roles] = useRolesQuery({ guildId: selectedGuild });
-  const [rawModRole] = useModRoleQuery({ guildId: selectedGuild })!;
-  const modRole = Option.fromJSON(rawModRole);
-  const { $cardLock } = useDashboardContext();
-  const cardLock = useStore($cardLock);
+  const [roles, rolesQuery] = useRolesQuery({ guildId: selectedGuild });
+  const [modRole, modRoleQuery] = useModRoleQuery({
+    guildId: selectedGuild,
+  })!;
+  const { cardLock } = useDashboardContext();
+  const $cardLock = useStore(cardLock);
 
   const mutation = useMutation<void, DefaultError, string>({
     mutationFn: (newRoleId: string) =>
@@ -78,16 +78,16 @@ function ModRoleCardContent({ selectedGuild }: ModRoleCardProps) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ guildId: selectedGuild, roleId: newRoleId }),
-      }).then((res) => {
-        if (!res.ok) throw new Error("Failed to update mod role");
-      }),
+      }).then(() => {}),
 
     onSuccess: (_, newRoleId) => {
-      queryClient.invalidateQueries({ queryKey: ["modRole", selectedGuild] });
+      queryClient.invalidateQueries({
+        queryKey: ["guild", selectedGuild, "mod-role"],
+      });
 
-      const role: { name: string; color: number } = roles.find(
-        (role) => role.id === newRoleId,
-      );
+      const role = roles.find((role) => role.id === newRoleId);
+
+      if (!role) return;
 
       toast(
         <p>
@@ -116,21 +116,26 @@ function ModRoleCardContent({ selectedGuild }: ModRoleCardProps) {
     [mutation],
   );
 
+  console.log("Roles:", roles);
+
   return (
-    <Card aria-disabled={cardLock}>
-      <CardHeader className="w-full max-w-sm">
+    <Card aria-disabled={$cardLock}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">Moderator role</CardTitle>
-        <CardDescription>
-          Select a role to allow to run privileged commands.
-        </CardDescription>
+        <Shield className="text-muted-foreground h-4 w-4" />
       </CardHeader>
 
       <CardContent className="flex h-12 flex-col items-center space-y-4">
         <div className="flex items-center space-x-2">
           <Select
-            value={modRole.isSome() ? modRole.unwrap() : undefined}
+            value={modRole ?? undefined}
             onValueChange={handleRoleChange}
-            disabled={cardLock || mutation.isPending}
+            disabled={
+              $cardLock ||
+              mutation.isPending ||
+              rolesQuery.isPending ||
+              modRoleQuery.isPending
+            }
           >
             <SelectTrigger className="w-48 cursor-pointer">
               <SelectValue placeholder="Select a role" />
@@ -171,11 +176,9 @@ function Role(props: { role: { name: string; color: number } }) {
 function FallbackCard() {
   return (
     <Card>
-      <CardHeader className="w-full max-w-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">Moderator role</CardTitle>
-        <CardDescription>
-          Select a role to allow to run privileged commands.
-        </CardDescription>
+        <Shield className="text-muted-foreground h-4 w-4" />
       </CardHeader>
       <CardContent className="flex h-12 flex-col items-center space-y-4">
         <Skeleton className="h-9 w-48" />

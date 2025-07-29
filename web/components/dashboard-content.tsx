@@ -14,10 +14,12 @@ import {
 import { useDashboardContext } from "@/lib/dashboard-context";
 import { BotInviteCard } from "./bot-invite-card";
 import { ModRoleCard } from "./mod-role-card";
+import { VanCommandCard } from "./van-command-card";
+import { VanRunsCard } from "./van-runs-card";
 
 export function DashboardContent() {
   const { selectedGuild, guilds } = useDashboardContext();
-  const selectedGuildName = guilds.find((g) => g.id === selectedGuild)
+  const selectedGuildName = guilds?.find((g) => g.id === selectedGuild)
     ?.name || <Skeleton className="ml-2 h-4 w-32" />;
 
   return (
@@ -43,6 +45,10 @@ export function DashboardContent() {
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
           <BotInviteCard selectedGuild={selectedGuild} />
           <ModRoleCard selectedGuild={selectedGuild} />
+          <VanRunsCard selectedGuild={selectedGuild} />
+        </div>
+        <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <VanCommandCard selectedGuild={selectedGuild} />
         </div>
       </div>
     </>

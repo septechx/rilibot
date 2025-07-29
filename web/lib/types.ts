@@ -25,10 +25,10 @@ export interface DiscordUser {
 }
 
 export interface DashboardContextType {
-  guilds: DiscordGuild[];
+  guilds: DiscordGuild[] | null;
   user: DiscordUser | null;
   selectedGuild: string | null;
   setSelectedGuild: (id: string | null) => void;
   loading: boolean;
-  $cardLock: WritableAtom<boolean>;
+  cardLock: WritableAtom<boolean>;
 }

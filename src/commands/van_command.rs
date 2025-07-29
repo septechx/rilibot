@@ -2,9 +2,9 @@ use anyhow::Result;
 use rand::Rng;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use crate::Handler;
+use crate::{Handler, db};
 
-use super::{assert_mod, send_error, send_usage, usage, CommandHandler};
+use super::{CommandHandler, assert_mod, send_error, send_usage, usage};
 
 pub struct VanCommand;
 
@@ -38,9 +38,13 @@ impl CommandHandler for VanCommand {
             }
         };
 
+        let guild_id_str = guild_id.get().to_string();
+        let (chance, _) = crate::db::queries::get_van_data(&state.db_client, &guild_id_str).await?;
+        db::queries::increment_van_runs(&state.db_client, &guild_id_str).await?;
+
         let number = rand::rng().random_range(1..=100);
 
-        if number != 33 {
+        if number > chance {
             for user_id in user_ids {
                 msg.channel_id
                     .say(&ctx.http, format!("Vanned <@{user_id}>."))

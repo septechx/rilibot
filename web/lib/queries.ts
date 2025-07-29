@@ -1,34 +1,32 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { OptionJSON, Option } from "./utils";
 import { DASH_URL } from "@/rilibot.config";
 
 export function useModRoleQuery(props: { guildId: string | null }) {
   const query = useSuspenseQuery({
-    queryKey: ["modRole", props.guildId],
+    queryKey: ["guild", props.guildId, "mod-role"],
     queryFn: async () => {
-      let res: OptionJSON<string>;
-
       if (props.guildId === null) {
-        res = Option.none<string>().toJSON();
-      } else {
-        res = await fetch(`${DASH_URL}/api/guild/mod-role`, {
-          body: JSON.stringify({ guildId: props.guildId }),
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-        })
-          .then(async (__res) => {
-            if (__res.status === 200) {
-              const body = await __res.json();
-              return Option.some<string>(body.roleId!);
-            }
-            return Option.none<string>();
-          })
-          .then((opt) => opt.toJSON());
+        return null;
       }
 
-      return res;
+      const response = await fetch(`${DASH_URL}/api/guild/mod-role`, {
+        body: JSON.stringify({ guildId: props.guildId }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
+
+      if (response.status === 200) {
+        const body = await response.json();
+        return body.roleId as string | null;
+      }
+      
+      if (response.status === 404) {
+        return null;
+      }
+
+      throw new Error("Failed to fetch mod role");
     },
   });
 
-  return [query.data as OptionJSON<string>, query] as const;
+  return [query.data as string | null, query] as const;
 }

@@ -7,10 +7,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Info } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useDashboardContext } from "@/lib/dashboard-context";
-import { DASH_URL } from "@/rilibot.config";
+import { CLIENT_ID, DASH_URL } from "@/rilibot.config";
 
 type BotInviteCardProps = {
   selectedGuild: string | null;
@@ -18,7 +18,7 @@ type BotInviteCardProps = {
 
 function useHasBotQuery(props: { guildId: string | null }) {
   const query = useSuspenseQuery({
-    queryKey: ["hasBot", props.guildId],
+    queryKey: ["guild", props.guildId, "has-bot"],
     queryFn: async () => {
       let res;
 
@@ -47,23 +47,21 @@ function useHasBotQuery(props: { guildId: string | null }) {
 
 function BotInviteCardContent({ selectedGuild }: BotInviteCardProps) {
   const [hasBot] = useHasBotQuery({ guildId: selectedGuild });
-  const { $cardLock } = useDashboardContext();
+  const { cardLock } = useDashboardContext();
 
   useEffect(() => {
-    $cardLock.set(!hasBot);
+    cardLock.set(!hasBot);
   }, [hasBot]);
 
   const inviteUrl = selectedGuild
-    ? `https://discord.com/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!}&guild_id=${selectedGuild}`
+    ? `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&guild_id=${selectedGuild}`
     : "#";
 
   return (
     <Card>
-      <CardHeader className="w-full max-w-sm">
-        <CardTitle className="text-sm font-medium">Bot Status</CardTitle>
-        <CardDescription>
-          Invite the bot if it's not in your server yet.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">Bot status</CardTitle>
+        <Info className="text-muted-foreground h-4 w-4" />
       </CardHeader>
 
       <CardContent className="flex h-12 flex-col items-center space-y-4">
@@ -91,11 +89,9 @@ function BotInviteCardContent({ selectedGuild }: BotInviteCardProps) {
 function FallbackCard() {
   return (
     <Card>
-      <CardHeader className="w-full max-w-sm">
-        <CardTitle className="text-sm font-medium">Bot Status</CardTitle>
-        <CardDescription>
-          Invite the bot if it's not in your server yet.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">Bot status</CardTitle>
+        <Info className="text-muted-foreground h-4 w-4" />
       </CardHeader>
 
       <CardContent className="flex h-12 flex-col items-center space-y-4">

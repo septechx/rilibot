@@ -26,27 +26,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDashboardContext } from "@/lib/dashboard-context";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface DiscordGuild {
-  id: string;
-  name: string;
-  icon: string | null;
-  owner: boolean;
-  permissions: string;
-  features: string[];
-}
-
-interface DiscordUser {
-  id: string;
-  username: string;
-  discriminator: string;
-  avatar: string | null;
-}
+import { useGuildQueries } from "@/hooks/use-guild-queries";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { guilds, user, selectedGuild, setSelectedGuild, loading } =
+  const { guilds, user, selectedGuild, setSelectedGuild } =
     useDashboardContext();
   const router = useRouter();
+  const { prefetchGuildData } = useGuildQueries();
 
   const getServerIcon = (guild: any) => {
     if (guild.icon) {
@@ -68,6 +54,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     document.cookie =
       "refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=Lax";
     router.push("/");
+  };
+
+  const handleGuildHover = (guildId: string) => {
+    if (guildId !== selectedGuild) {
+      prefetchGuildData(guildId);
+    }
   };
 
   return (
@@ -96,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Your Servers </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {loading ? (
+              {!guilds ? (
                 new Array(5).fill(0).map((_, i) => (
                   <SidebarMenuItem key={i}>
                     <SidebarMenuButton className="w-full cursor-pointer justify-start">
@@ -117,6 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuItem key={guild.id}>
                     <SidebarMenuButton
                       onClick={() => setSelectedGuild(guild.id)}
+                      onMouseEnter={() => handleGuildHover(guild.id)}
                       isActive={selectedGuild === guild.id}
                       className="w-full cursor-pointer justify-start"
                     >

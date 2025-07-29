@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
     !accessToken ||
     !validateToken(encryptedToken, iv, token)
   ) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized", roles: [] }, { status: 401 });
   }
 
   if (!guildId) {
-    return NextResponse.json({ error: "Bad request" }, { status: 400 });
+    return NextResponse.json({ error: "Bad request", roles: [] }, { status: 400 });
   }
 
   const rolesRes = await fetch(
