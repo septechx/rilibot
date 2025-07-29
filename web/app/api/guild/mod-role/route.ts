@@ -9,16 +9,18 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("refresh_token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
   const encryptedToken = cookieStore.get("api_token")?.value;
   const iv = cookieStore.get("iv")?.value;
   const { guildId } = await request.json();
-  const authorized = await authorize(guildId);
+  const authorized = await authorize(guildId, accessToken ?? "");
 
   if (
     !token ||
     !encryptedToken ||
     !iv ||
     !authorized ||
+    !accessToken ||
     !validateToken(encryptedToken, iv, token)
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

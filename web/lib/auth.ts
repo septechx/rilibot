@@ -1,4 +1,4 @@
-import { url } from "./consts";
+import { fetchGuilds } from "./fetch-guilds";
 import { DiscordGuild } from "./types";
 
 export function canManageGuild(guild: DiscordGuild) {
@@ -10,13 +10,15 @@ export function canManageGuild(guild: DiscordGuild) {
   );
 }
 
-export async function authorize(guildId: string) {
-  const response = await fetch(`${url}/api/user/guilds`);
-  if (!response.ok) {
+export async function authorize(guildId: string, accessToken: string) {
+  let guilds: DiscordGuild[];
+
+  try {
+    guilds = await fetchGuilds(accessToken).then((res) => res.guilds);
+  } catch {
     return false;
   }
-  let data = await response.json();
-  (data.guilds as DiscordGuild[])
-    .filter(canManageGuild)
-    .filter((guild) => guild.id == guildId).length === 1;
+
+  guilds.filter(canManageGuild).filter((guild) => guild.id == guildId)
+    .length === 1;
 }
