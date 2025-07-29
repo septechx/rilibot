@@ -39,7 +39,7 @@ impl CommandHandler for VanCommand {
         };
 
         let guild_id_str = guild_id.get().to_string();
-        let (chance, _) = crate::db::queries::get_van_data(&state.db_client, &guild_id_str).await?;
+        let (chance, _) = db::queries::get_van_data(&state.db_client, &guild_id_str).await?;
         db::queries::increment_van_runs(&state.db_client, &guild_id_str).await?;
 
         let number = rand::rng().random_range(1..=100);

@@ -8,7 +8,6 @@ import { useVanChanceQuery } from "@/hooks/use-van-chance-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DASH_URL } from "@/rilibot.config";
 import { toast } from "sonner";
-import { Ban } from "lucide-react";
 
 type CommandCardProps = {
   selectedGuild: string | null;
@@ -63,7 +62,6 @@ function CommandsCardContent({ selectedGuild }: CommandCardProps) {
               Change the ban chance
             </p>
           </div>
-          <Ban className="text-muted-foreground h-4 w-4" />
         </div>
         <div className="flex items-center gap-2">
           <input
@@ -93,7 +91,6 @@ function FallbackCard() {
               Change the ban chance
             </p>
           </div>
-          <Ban className="text-muted-foreground h-4 w-4" />
         </div>
         <div className="flex items-center gap-2">
           <input

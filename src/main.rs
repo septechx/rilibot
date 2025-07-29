@@ -73,21 +73,19 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        self.message_handlers
-            .process_message(self, &ctx, &msg)
-            .await;
-
+        // Process hooks firs to avoid a hook being called on the same message it was spawned from
         let mut hooks = self.hooks.lock().await;
-
         let mut remaining_hooks = Vec::new();
-
         for hook in hooks.drain(..) {
             if !hook.run(self, &ctx, &msg).await {
                 remaining_hooks.push(hook);
             }
         }
-
         *hooks = remaining_hooks;
+
+        self.message_handlers
+            .process_message(self, &ctx, &msg)
+            .await;
     }
 
     async fn ready(&self, _ctx: Context, ready: Ready) {

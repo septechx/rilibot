@@ -5,7 +5,7 @@ use serenity::{
     prelude::*,
 };
 
-use crate::{log, structs::Hook, Handler};
+use crate::{Handler, log, structs::Hook};
 
 use super::TagHandler;
 
@@ -26,11 +26,13 @@ impl Hook for JokeReplyHook {
         log::hook("JokeReply", self);
 
         if self.joke_channel_id == msg.channel_id && !msg.author.bot {
+            log::hook_handle("JokeReply", self);
             msg.channel_id
                 .say(&ctx.http, "Como que el otro?")
                 .await
                 .is_ok()
         } else {
+            log::hook_unhandle("JokeReply", self);
             false
         }
     }
