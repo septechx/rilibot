@@ -13,7 +13,6 @@ use serenity::{
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
-use tokio::sync::Mutex;
 
 use std::{env, sync::Arc};
 
@@ -75,14 +74,22 @@ impl Handler {
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         // Process hooks first to avoid a hook being called on the same message it was spawned from
-        let mut hooks = self.hooks.lock().await;
-        let mut remaining_hooks = Vec::new();
-        for hook in hooks.drain(..) {
+        let hooks_vec = {
+            let mut guard = self.hooks.lock().await;
+            std::mem::take(&mut *guard)
+        };
+
+        let mut remaining = Vec::new();
+        for hook in hooks_vec {
             if !hook.run(self, &ctx, &msg).await {
-                remaining_hooks.push(hook);
+                remaining.push(hook);
             }
         }
-        *hooks = remaining_hooks;
+
+        {
+            let mut guard = self.hooks.lock().await;
+            *guard = remaining;
+        }
 
         self.message_handlers
             .process_message(self, &ctx, &msg)

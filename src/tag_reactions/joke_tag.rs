@@ -5,7 +5,7 @@ use serenity::{
     prelude::*,
 };
 
-use crate::{Handler, log, structs::Hook};
+use crate::{log, structs::Hook, Handler};
 
 use super::TagHandler;
 
