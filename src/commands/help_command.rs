@@ -30,10 +30,6 @@ impl CommandHandler for HelpCommand {
                 let name = env!("CARGO_PKG_NAME");
                 let version = env!("CARGO_PKG_VERSION");
 
-                msg.channel_id
-                    .say(&ctx.http, format!("{name} v{version}"))
-                    .await?;
-
                 let cmds = state
                     .command_handlers
                     .handlers
@@ -43,7 +39,10 @@ impl CommandHandler for HelpCommand {
                     .join("\n");
 
                 msg.channel_id
-                    .say(&ctx.http, format!("**Commands:**\n{cmds}"))
+                    .say(
+                        &ctx.http,
+                        format!("{name} v{version}\n**Commands:**\n{cmds}"),
+                    )
                     .await?;
             }
             1 => {
