@@ -1,7 +1,9 @@
+use std::env;
+
 use anyhow::Result;
 use serenity::{async_trait, model::channel::Message, prelude::*};
 
-use super::{CommandHandler, args, send_error, usage};
+use super::{args, send_error, usage, CommandHandler};
 
 use crate::Handler;
 
@@ -25,6 +27,13 @@ impl CommandHandler for HelpCommand {
 
         match args.len() {
             0 => {
+                let name = env!("CARGO_PKG_NAME");
+                let version = env!("CARGO_PKG_VERSION");
+
+                msg.channel_id
+                    .say(&ctx.http, format!("{name} v{version}"))
+                    .await?;
+
                 let cmds = state
                     .command_handlers
                     .handlers
