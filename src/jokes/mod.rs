@@ -1,8 +1,10 @@
+mod medio_joke;
 mod pez_joke;
 
 use rand::Rng;
 use serenity::async_trait;
 
+pub use medio_joke::MedioJoke;
 pub use pez_joke::PezJoke;
 
 #[async_trait]
