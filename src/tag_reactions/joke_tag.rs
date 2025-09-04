@@ -11,24 +11,42 @@ use super::TagHandler;
 
 #[derive(Debug)]
 pub struct JokeReplyHook {
+    joke_replies: Vec<String>,
     joke_channel_id: ChannelId,
 }
 
 impl JokeReplyHook {
-    pub fn new(joke_channel_id: ChannelId) -> Box<Self> {
-        Box::new(JokeReplyHook { joke_channel_id })
+    pub fn new(joke_channel_id: ChannelId, joke_replies: Vec<String>) -> Self {
+        Self {
+            joke_replies,
+            joke_channel_id,
+        }
     }
 }
 
 #[async_trait]
 impl Hook for JokeReplyHook {
-    async fn run(&self, _state: &Handler, ctx: &Context, msg: &Message) -> bool {
+    async fn run(&self, state: &Handler, ctx: &Context, msg: &Message) -> bool {
         log::hook("JokeReply", self);
 
         if self.joke_channel_id == msg.channel_id && !msg.author.bot {
             log::hook_handle("JokeReply", self);
+
+            if self.joke_replies.is_empty() {
+                return true;
+            }
+
+            let hook = JokeReplyHook::new(self.joke_channel_id, self.joke_replies[1..].to_vec());
+
+            let hooks = state.get_hooks();
+
+            {
+                let mut hooks_guard = hooks.lock().await;
+                hooks_guard.push(Box::new(hook));
+            }
+
             msg.channel_id
-                .say(&ctx.http, "Como que el otro?")
+                .say(&ctx.http, &self.joke_replies[0])
                 .await
                 .is_ok()
         } else {
@@ -54,13 +72,18 @@ impl TagHandler for JokeHandler {
     }
 
     async fn handle(&self, state: &Handler, ctx: &Context, msg: &Message) -> Result<()> {
-        msg.channel_id
-            .say(&ctx.http, "Que le dice un pez al otro?")
-            .await?;
+        let joke = state.jokes.get_random_joke();
+
+        msg.channel_id.say(&ctx.http, joke.get_joke()).await?;
+
+        let hook = JokeReplyHook::new(msg.channel_id, joke.get_responses());
 
         let hooks = state.get_hooks();
-        let mut hooks_guard = hooks.lock().await;
-        hooks_guard.push(JokeReplyHook::new(msg.channel_id));
+
+        {
+            let mut hooks_guard = hooks.lock().await;
+            hooks_guard.push(Box::new(hook));
+        }
 
         Ok(())
     }

@@ -1,6 +1,7 @@
 mod commands;
 mod db;
 mod handlers;
+mod jokes;
 mod log;
 mod structs;
 mod tag_reactions;
@@ -24,6 +25,8 @@ use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler, TagHandler};
 use structs::Hook;
 use tag_reactions::{JokeHandler, TagHandlerRegistry};
 
+use crate::jokes::{JokeRegistry, PezJoke};
+
 lazy_static! {
     pub static ref CLIENT_ID: String = get_env_var("DISCORD_CLIENT_ID");
     pub static ref TOKEN: String = get_env_var("DISCORD_TOKEN");
@@ -36,6 +39,7 @@ pub struct Handler {
     message_handlers: MessageHandlerRegistry,
     command_handlers: CommandHandlerRegistry,
     tag_handlers: TagHandlerRegistry,
+    jokes: JokeRegistry,
 }
 
 impl Handler {
@@ -56,12 +60,16 @@ impl Handler {
         chr.register("role", RoleCommand::new());
         chr.register("van", VanCommand::new());
 
+        let mut jr = JokeRegistry::new();
+        jr.register(PezJoke::new());
+
         Self {
             db_client: clt,
             hooks: Arc::new(Mutex::new(Vec::new())),
             message_handlers: mhr,
             tag_handlers: thr,
             command_handlers: chr,
+            jokes: jr,
         }
     }
 
