@@ -1,11 +1,13 @@
 mod medio_joke;
 mod pez_joke;
+mod semaforo_joke;
 
 use rand::Rng;
 use serenity::async_trait;
 
 pub use medio_joke::MedioJoke;
 pub use pez_joke::PezJoke;
+pub use semaforo_joke::SemaforoJoke;
 
 #[async_trait]
 pub trait Joke: Send + Sync {

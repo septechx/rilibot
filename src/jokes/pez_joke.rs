@@ -14,6 +14,6 @@ impl Joke for PezJoke {
     }
 
     fn get_responses(&self) -> Vec<String> {
-        vec!["Como que el otro?".to_string()]
+        vec!["Nada".to_string()]
     }
 }

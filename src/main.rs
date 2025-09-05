@@ -25,7 +25,7 @@ use handlers::{CommandHandler, MessageHandlerRegistry, OtroHandler, TagHandler};
 use structs::Hook;
 use tag_reactions::{JokeHandler, TagHandlerRegistry};
 
-use crate::jokes::{JokeRegistry, MedioJoke, PezJoke};
+use crate::jokes::{JokeRegistry, MedioJoke, PezJoke, SemaforoJoke};
 
 lazy_static! {
     pub static ref CLIENT_ID: String = get_env_var("DISCORD_CLIENT_ID");
@@ -63,6 +63,7 @@ impl Handler {
         let mut jr = JokeRegistry::new();
         jr.register(PezJoke::new());
         jr.register(MedioJoke::new());
+        jr.register(SemaforoJoke::new());
 
         Self {
             db_client: clt,

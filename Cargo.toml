@@ -1,6 +1,6 @@
 [package]
 name = "rilibot"
-version = "3.7.3"
+version = "3.7.4"
 edition = "2024"
 
 [dependencies]
